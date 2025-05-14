@@ -19,6 +19,7 @@ jobs:
         uses: actions/setup-go@v5
         with:
           go-version: '1.22'
+          cache: true
       - name: Build Project
         run: |
           make release
@@ -32,5 +33,5 @@ jobs:
       - name: Upload to S3
         id: s3
         run: |
-          S3_DESTINATION="s3:/creds-helper-intermediate-bucket-for-deployment"
+          S3_DESTINATION="s3://creds-helper-intermediate-bucket-for-deployment"
           aws s3 cp build/bin/aws_signing_helper "${S3_DESTINATION}/aws_signing_helper"
