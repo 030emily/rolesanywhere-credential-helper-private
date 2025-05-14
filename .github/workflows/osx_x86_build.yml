@@ -21,7 +21,7 @@ jobs:
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4.2.0
         with:
-          role-to-assume: arn:aws:iam::019601885680:role/s3GithubWriteRole
+          role-to-assume: arn:aws:iam::019601885680:role/s3fullaccessgithubrole
           role-session-name: githubmscosintelbuild
           aws-region: us-west-2
       - name: Upload to S3
