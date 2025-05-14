@@ -1,0 +1,19 @@
+name: Build darwin binaries
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  Run-on-macos-intel:
+    name: Run on macos intel
+    runs-on: macos-13
+    steps: 
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Use go
+        uses: actions/setup-go@v5
+      - name: Build Project
+        run: |
+          make release
+          ls build/bin
+      
