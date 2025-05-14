@@ -18,4 +18,14 @@ jobs:
         run: |
           make release
           ls -la build/bin
-      
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4.2.0
+        with:
+          role-to-assume: arn:aws:iam::019601885680:role/s3GithubWriteRole
+          role-session-name: githubmscosintelbuild
+          aws-region: us-west-2
+      - name: Upload to S3
+        id: s3
+        run: |
+          S3_DESTINATION="s3:/creds-helper-intermediate-bucket-for-deployment"
+          aws s3 cp build/bin/aws_signing_helper "${S3_DESTINATION}/aws_signing_helper"
