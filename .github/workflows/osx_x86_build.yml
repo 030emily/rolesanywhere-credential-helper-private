@@ -31,6 +31,7 @@ jobs:
           cache: true
       - name: Build Project
         run: |
+          brew install gnu-sed
           echo "Building on ${{ matrix.display_name }}"
           make release
           make test-certs
