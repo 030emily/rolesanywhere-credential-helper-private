@@ -29,9 +29,14 @@ jobs:
         with:
           go-version: '1.22'
           cache: true
-      - name: Build Project
+      - name: Install gnu-sed as sed
         run: |
           brew install gnu-sed
+          PATH="/opt/homebrew/opt/gnu-sed/libexec/gnubin:$PATH"
+        with:
+          cache:true
+      - name: Build Project
+        run: |
           echo "Building on ${{ matrix.display_name }}"
           make release
           make test-certs
