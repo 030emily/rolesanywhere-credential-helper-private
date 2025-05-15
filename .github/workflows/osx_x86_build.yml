@@ -18,9 +18,11 @@ jobs:
           - runsonimage: macos-13
             s3_path: darwin/x86
             display_name: "macOS Intel (x86_64)"
+            gsed_path:"PATH='/usr/local/opt/gnu-sed/libexec/gnubin:$PATH'"
           - runsonimage: macos-14
             s3_path: darwin/aarch64
             display_name: "macOS Apple Silicon (M1)"
+            gsed_path:"PATH='/opt/homebrew/opt/gnu-sed/libexec/gnubin:$PATH'"
     steps: 
       - name: Checkout code
         uses: actions/checkout@v4
@@ -34,7 +36,7 @@ jobs:
           brew install gnu-sed
       - name: Build Project
         run: |
-          export PATH="/opt/homebrew/opt/gnu-sed/libexec/gnubin:$PATH"
+          export ${{matrix.gsed_path}}
           echo "Building on ${{ matrix.display_name }}"
           make release
           make test-certs
