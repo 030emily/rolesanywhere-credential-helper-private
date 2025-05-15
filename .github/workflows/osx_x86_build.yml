@@ -9,9 +9,18 @@ permissions:
   id-token: write # This is required for requesting the JWT/OIDC
 
 jobs:
-  Run-on-macos-intel:
-    name: Run on macos intel
-    runs-on: macos-13
+  build-on-macos:
+    name: Build on ${{matrix.runsonimage}}
+    runs-on: ${{matrix.runsonimage}}
+    strategy:
+      matrix:
+        include:
+          - runsonimage: macos-13
+            s3_path: darwin/x86
+            display_name: "macOS Intel (x86_64)"
+          - runsonimage: macos-14
+            s3_path: darwin/aarch64
+            display_name: "macOS Apple Silicon (M1)"
     steps: 
       - name: Checkout code
         uses: actions/checkout@v4
@@ -22,6 +31,7 @@ jobs:
           cache: true
       - name: Build Project
         run: |
+          echo "Building on ${{ matrix.display_name }}"
           make release
           ls -la build/bin
       - name: Configure AWS credentials
@@ -34,4 +44,4 @@ jobs:
         id: s3
         run: |
           S3_DESTINATION="s3://creds-helper-intermediate-bucket-for-deployment"
-          aws s3 cp build/bin/aws_signing_helper "${S3_DESTINATION}/aws_signing_helper"
+          aws s3 cp build/bin/aws_signing_helper "${S3_DESTINATION}/${{ matrix.s3_path }}/aws_signing_helper"
