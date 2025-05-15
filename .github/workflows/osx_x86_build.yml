@@ -18,11 +18,11 @@ jobs:
           - runsonimage: macos-13
             s3_path: darwin/x86
             display_name: "macOS Intel (x86_64)"
-            gsed_path:"PATH='/usr/local/opt/gnu-sed/libexec/gnubin:$PATH'"
+            gsed_path: "PATH='/usr/local/opt/gnu-sed/libexec/gnubin:$PATH'"
           - runsonimage: macos-14
             s3_path: darwin/aarch64
             display_name: "macOS Apple Silicon (M1)"
-            gsed_path:"PATH='/opt/homebrew/opt/gnu-sed/libexec/gnubin:$PATH'"
+            gsed_path: "PATH='/opt/homebrew/opt/gnu-sed/libexec/gnubin:$PATH'"
     steps: 
       - name: Checkout code
         uses: actions/checkout@v4
