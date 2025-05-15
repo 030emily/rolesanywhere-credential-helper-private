@@ -32,9 +32,9 @@ jobs:
       - name: Install gnu-sed as sed
         run: |
           brew install gnu-sed
-          export PATH="/opt/homebrew/opt/gnu-sed/libexec/gnubin:$PATH"
       - name: Build Project
         run: |
+          export PATH="/opt/homebrew/opt/gnu-sed/libexec/gnubin:$PATH"
           echo "Building on ${{ matrix.display_name }}"
           make release
           make test-certs
