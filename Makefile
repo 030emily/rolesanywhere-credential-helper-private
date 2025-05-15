@@ -98,7 +98,7 @@ START_SWTPM_TCP := \
 	fi
 STOP_SWTPM_TCP := swtpm_ioctl --tcp 127.0.0.1:2322 -s && kill $$(pgrep tpm2-abrmd)
 
-# This one is used for the actual test run
+# This one is ugsed for the actual test run
 START_SWTPM_UNIX := \
 	if ! swtpm_ioctl --unix $(SWTPM_CTRLSOCK) -g >/dev/null 2>/dev/null; then \
 		$(SWTPM) $(SWTPM_UNIX) --flags not-need-init,startup-clear -d; \
@@ -209,11 +209,11 @@ endif
 
 export TPM_DEVICE
 
-# It's hard to ao a file-based rule for the contents of the SoftHSM token.
+# It's hard to ao a file-bagsed rule for the contents of the SoftHSM token.
 # So just populate it as a side-effect of creating the softhsm2.conf file.
 tst/softhsm2.conf: tst/softhsm2.conf.template $(PKCS8KEYS) $(RSACERTS) $(ECCERTS)
 	rm -rf tst/softhsm/*
-	sed 's|@top_srcdir@|${curdir}|g' $< > $@.tmp
+	gsed 's|@top_srcdir@|${curdir}|g' $< > $@.tmp
 	$(SHM2_UTIL) --show-slots
 	$(SHM2_UTIL) --init-token --free --label credential-helper-test \
 		--so-pin 12345678 --pin 1234
@@ -258,10 +258,10 @@ test-tpm-signer: $(certsdir)/cert-bundle.pem $(TPMKEYS) $(TPMCERTS) $(TPMLOADEDK
 
 .PHONY: test
 test: test-certs
-	go test ./... -list . | grep -E '^Test[a-zA-Z0-9]+' | grep -vE 'TPMSigner|PKCS11Signer' | tr '\n' '|' | sed 's/|$$//' | xargs -t go test ./... -run
+	go test ./... -list . | grep -E '^Test[a-zA-Z0-9]+' | grep -vE 'TPMSigner|PKCS11Signer' | tr '\n' '|' | gsed 's/|$$//' | xargs -t go test ./... -run
 
 define CERT_RECIPE
-	@SUBJ=$$(echo "$@" | sed 's^\(.*/\)\?\([^/]*\)-cert.pem^\2^'); \
+	@SUBJ=$$(echo "$@" | gsed 's^\(.*/\)\?\([^/]*\)-cert.pem^\2^'); \
 	[ "$${SUBJ#tpm-}" != "$${SUBJ}" ] && ENG="-provider tpm2 -provider default -propquery '?provider=tpm2'";  \
 	if [ "$${SUBJ#tpm-sw-}" != "$${SUBJ}" ]; then $(START_SWTPM_TCP); TPM_PREFIX="$(SWTPM_PREFIX)"; fi; \
 	if echo $< | grep -q "loaded"; then KEY=handle:0x$(word 4, $(subst -, , $<)); else KEY=$<; fi; \
@@ -276,13 +276,13 @@ endef
 %-sha512-cert.pem: %-key.pem; $(CERT_RECIPE)
 
 %-combo.pem: %-cert.pem
-	KEY=$$(echo "$@" | sed 's/-[^-]*-combo.pem/-key.pem/'); \
+	KEY=$$(echo "$@" | gsed 's/-[^-]*-combo.pem/-key.pem/'); \
 	cat $${KEY} $< > $@.tmp && mv $@.tmp $@
 
 # Go PKCS#12 only supports SHA1 and 3DES!!
 %.p12: %-cert.pem
-	KEY=$$(echo "$@" | sed 's/-[^-]*\.p12/-key.pem/'); \
-	CERT=$$(echo "$@" | sed 's/.p12/-cert.pem/'); \
+	KEY=$$(echo "$@" | gsed 's/-[^-]*\.p12/-key.pem/'); \
+	CERT=$$(echo "$@" | gsed 's/.p12/-cert.pem/'); \
 	openssl pkcs12 -export -passout pass: -macalg SHA1 \
 		-certpbe pbeWithSHA1And3-KeyTripleDES-CBC \
 		-keypbe pbeWithSHA1And3-KeyTripleDES-CBC \
@@ -291,7 +291,7 @@ endef
 %-pass.p12: %-cert.pem
 	echo Creating $@...
 	ls -l $<
-	KEY=$$(echo "$@" | sed 's/-[^-]*\-pass.p12/-key.pem/'); \
+	KEY=$$(echo "$@" | gsed 's/-[^-]*\-pass.p12/-key.pem/'); \
 	openssl pkcs12 -export -passout pass:test -macalg SHA1 \
 		-certpbe pbeWithSHA1And3-KeyTripleDES-CBC \
 		-keypbe pbeWithSHA1And3-KeyTripleDES-CBC \
@@ -327,11 +327,11 @@ $(certsdir)/tpm-hw-ec-81000001-key.pem:
 	openssl genpkey -provider tpm2 -algorithm EC -pkeyopt group:prime256v1 -pkeyopt parent:0x81000001 -pkeyopt user-auth:1234 -out $@
 
 $(RSAKEYS):
-	KEYLEN=$$(echo "$@" | sed 's/.*rsa-\([0-9]*\)-key.pem/\1/'); \
+	KEYLEN=$$(echo "$@" | gsed 's/.*rsa-\([0-9]*\)-key.pem/\1/'); \
 	openssl genrsa -out $@ $${KEYLEN}
 
 $(ECKEYS):
-	CURVE=$$(echo "$@" | sed 's/.*ec-\([^-]*\)-key.pem/\1/'); \
+	CURVE=$$(echo "$@" | gsed 's/.*ec-\([^-]*\)-key.pem/\1/'); \
 	openssl ecparam -name $${CURVE} -genkey -out $@
 
 $(certsdir)/cert-bundle.pem: $(RSACERTS) $(ECCERTS)
