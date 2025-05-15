@@ -32,7 +32,7 @@ jobs:
       - name: Install gnu-sed as sed
         run: |
           brew install gnu-sed
-          PATH="/opt/homebrew/opt/gnu-sed/libexec/gnubin:$PATH"
+          export PATH="/opt/homebrew/opt/gnu-sed/libexec/gnubin:$PATH"
       - name: Build Project
         run: |
           echo "Building on ${{ matrix.display_name }}"
