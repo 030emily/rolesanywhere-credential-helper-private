@@ -48,5 +48,5 @@ jobs:
       - name: Upload to S3
         id: s3
         run: |
-          S3_DESTINATION="${{ secrets.INTERMEDIATE_BUCKET_NAME }}"
+          S3_DESTINATION="s3://${{ secrets.INTERMEDIATE_BUCKET_NAME }}"
           aws s3 cp build/bin/aws_signing_helper "${S3_DESTINATION}/${{ matrix.s3_path }}/aws_signing_helper"
