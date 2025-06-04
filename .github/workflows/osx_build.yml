@@ -50,8 +50,8 @@ jobs:
         run: |
           S3_DESTINATION="s3://${{ secrets.INTERMEDIATE_BUCKET_NAME }}"
           if [[ "${{ matrix.arch }}" == "X86_64" ]]; then
-            s3_prefix=${{ secrets.MACOS_X86_64_S3_PATH }}
+            S3_PREFIX=${{ secrets.MACOS_X86_64_S3_PATH }}
           else
-            s3_prefix=${{ secrets.MACOS_AARCH64_S3_PATH }}
+            S3_PREFIX=${{ secrets.MACOS_AARCH64_S3_PATH }}
           fi
-          aws s3 cp build/bin/aws_signing_helper "${S3_DESTINATION}/${s3_prefix}/aws_signing_helper"
+          aws s3 cp build/bin/aws_signing_helper "${S3_DESTINATION}/${S3_PREFIX}/aws_signing_helper"
