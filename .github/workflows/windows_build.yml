@@ -50,5 +50,5 @@ jobs:
         run: |
           $S3_DESTINATION = "s3://${{ secrets.INTERMEDIATE_BUCKET_NAME }}"
           $S3_PATH = "${{ secrets.WINDOWS_X86_64_S3_PATH }}"
-          aws s3 cp build/bin/aws_signing_helper.exe "${S3_DESTINATION}/${S3_PATH}/aws_signing_helper.exe"
+          aws s3 cp build/bin/aws_signing_helper "${S3_DESTINATION}/${S3_PATH}/aws_signing_helper.exe"
         shell: pwsh
