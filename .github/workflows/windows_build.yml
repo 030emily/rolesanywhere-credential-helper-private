@@ -33,9 +33,7 @@ jobs:
         run: |
           echo "Building on ${{ matrix.display_name }}"
           make release
-          ls
-          ls build/
-          ls build/bin
+          make test
         shell: pwsh
       
       - name: Configure AWS credentials
