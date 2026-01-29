@@ -10,6 +10,7 @@ RUN yum -y install \
     golang \
     tar \
     gzip \
+    openssl \
     && yum clean all
 
 # Set up Go environment
