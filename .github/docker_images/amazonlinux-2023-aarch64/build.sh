@@ -2,27 +2,11 @@
 set -e
 
 # Build script for Amazon Linux 2023 aarch64 Docker image
-# Usage: ./build.sh [--push]
+# Usage: ./build.sh
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 IMAGE_NAME="rolesanywhere-credential-helper-al2023-aarch64-builder"
 IMAGE_TAG="latest"
-
-# Parse arguments
-PUSH=false
-while [[ $# -gt 0 ]]; do
-    case $1 in
-        --push)
-            PUSH=true
-            shift
-            ;;
-        *)
-            echo "Unknown option: $1"
-            echo "Usage: $0 [--push]"
-            exit 1
-            ;;
-    esac
-done
 
 echo "Building Docker image: ${IMAGE_NAME}:${IMAGE_TAG}"
 
@@ -30,12 +14,7 @@ echo "Building Docker image: ${IMAGE_NAME}:${IMAGE_TAG}"
 docker buildx build \
     --platform linux/arm64 \
     -t "${IMAGE_NAME}:${IMAGE_TAG}" \
-    ${PUSH:+--push} \
+    --load \
     "${SCRIPT_DIR}"
 
-echo "Build complete!"
-if [ "$PUSH" = true ]; then
-    echo "Image pushed to registry"
-else
-    echo "Image built locally (use --push to push to registry)"
-fi
+echo "Build complete."

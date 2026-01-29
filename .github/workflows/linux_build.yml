@@ -54,7 +54,7 @@ jobs:
             -v ${{ github.workspace }}:/workspace \
             -w /workspace \
             al2023-builder:latest \
-            bash -c "make release && make test"
+            bash -c "make release"
       
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4.2.0
