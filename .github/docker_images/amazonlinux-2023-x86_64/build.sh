@@ -10,13 +10,19 @@ IMAGE_TAG="latest"
 
 echo "Building Docker image: ${IMAGE_NAME}:${IMAGE_TAG}"
 
-# Build for x86_64 from workspace root to access go.mod
+# Get Go version from go.mod
 WORKSPACE_ROOT="$(cd "${SCRIPT_DIR}/../../.." && pwd)"
+GO_VERSION=$(grep '^toolchain' "${WORKSPACE_ROOT}/go.mod" | awk '{print $2}' | sed 's/go//')
+
+echo "Using Go version: ${GO_VERSION}"
+
+# Build for x86_64 from the docker image directory
 docker buildx build \
     --platform linux/amd64 \
+    --build-arg GO_VERSION="${GO_VERSION}" \
     -t "${IMAGE_NAME}:${IMAGE_TAG}" \
     -f "${SCRIPT_DIR}/Dockerfile" \
     --load \
-    "${WORKSPACE_ROOT}"
+    "${SCRIPT_DIR}"
 
 echo "Build complete."
