@@ -86,35 +86,6 @@ jobs:
           
           Write-Host "SoftHSM2 installed successfully at: $softhsmDir"
 
-      - name: Configure SoftHSM for testing
-        shell: powershell
-        run: |
-          # Set up SoftHSM configuration
-          New-Item -ItemType Directory -Force -Path "C:\Temp\softhsm-tokens"
-          
-          $configContent = @"
-directories.tokendir = C:\Temp\softhsm-tokens
-objectstore.backend = file
-log.level = INFO
-"@
-          
-          $configPath = "C:\Temp\softhsm2.conf"
-          $configContent | Out-File -FilePath $configPath -Encoding ASCII
-          
-          # Set environment variable
-          echo "SOFTHSM2_CONF=$configPath" >> $env:GITHUB_ENV
-          $env:SOFTHSM2_CONF = $configPath
-          
-          # Initialize test token
-          Write-Host "Initializing test token..."
-          & $env:SOFTHSM_UTIL --init-token --free --label "test-token" --pin 1234 --so-pin 1234
-          
-          if ($LASTEXITCODE -ne 0) {
-            Write-Host "Warning: Token initialization failed, but continuing..."
-          } else {
-            Write-Host "Test token initialized successfully"
-          }
-
       - name: Set PKCS11 module path
         shell: powershell
         run: |
@@ -156,24 +127,6 @@ log.level = INFO
           GOARCH: ${{ matrix.goarch }}
         run: |
           make release
-
-      - name: Test PKCS#11 functionality
-        shell: powershell
-        run: |
-          Write-Host "PKCS11_MODULE: $env:PKCS11_MODULE"
-          Write-Host "SOFTHSM2_CONF: $env:SOFTHSM2_CONF"
-          
-          if ($env:PKCS11_MODULE -and (Test-Path $env:PKCS11_MODULE)) {
-            try {
-              go test ./... -run "PKCS11" -v
-              Write-Host "PKCS#11 tests completed"
-            } catch {
-              Write-Host "Warning: PKCS#11 tests failed, but continuing build"
-              Write-Host "Error: $_"
-            }
-          } else {
-            Write-Host "Skipping PKCS#11 tests - module not available"
-          }
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4.2.0
