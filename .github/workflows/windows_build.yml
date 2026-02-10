@@ -11,7 +11,7 @@ permissions:
 jobs:
   Windows:
     name: Build on ${{matrix.display_name}}
-    runs-on: ${{ matrix.runner }}
+    runs-on: ${{ matrix.runner_image }}
     strategy:
       matrix:
         include:
