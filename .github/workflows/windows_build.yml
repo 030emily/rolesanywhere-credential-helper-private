@@ -19,6 +19,7 @@ jobs:
             arch: "X86_64"
             goarch: "amd64"
             display_name: "Windows X86_64"
+            s3_path_secret: "WINDOWS_X86_64_S3_PATH"
     
     steps:
       - name: Checkout code
