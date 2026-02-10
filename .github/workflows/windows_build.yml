@@ -15,48 +15,46 @@ jobs:
     strategy:
       matrix:
         include:
-          - arch: "X86_64"
-            display_name: "Windows X86_64"
-            runner: "windows-2022"
+          - runner_image: windows-2022
+            arch: "X86_64"
             goarch: "amd64"
-            s3_path_secret: "WINDOWS_X86_64_S3_PATH"
-
+            display_name: "Windows X86_64"
+    
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-
-      - name: Get Go version from go.mod
-        id: go-version
-        shell: bash
-        run: |
-          GO_VERSION=$(grep '^toolchain' go.mod | awk '{print $2}' | sed 's/go//')
-          echo "version=${GO_VERSION}" >> $GITHUB_OUTPUT
-
-      - name: Set up Go
-        uses: actions/setup-go@v4
+      
+      - name: Setup go
+        uses: actions/setup-go@v5
         with:
-          go-version: ${{ steps.go-version.outputs.version }}
-
-      - name: Build with CGo enabled
-        shell: bash
+          go-version-file: 'go.mod'
+          cache: true
+      
+      - name: Build Project
         env:
           CGO_ENABLED: 1 
           GOOS: windows
           GOARCH: ${{ matrix.goarch }}
         run: |
+          echo "Building on ${{ matrix.display_name }}"
+          $env:CGO_ENABLED = "1"
+          $env:GOOS = "windows"
+          $env:GOARCH = "${{ matrix.goarch }}"
           make release
-
+          make test
+        shell: pwsh
+      
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4.2.0
         with:
           role-to-assume: ${{ secrets.BINARY_BUILDING_ROLE_ARN }}
           role-session-name: githubwindowsbuild
           aws-region: us-west-2
-
+      
       - name: Upload to S3
         id: s3
-        shell: bash
         run: |
           S3_DESTINATION="s3://${{ secrets.INTERMEDIATE_BUCKET_NAME }}"
           S3_PATH=${{ secrets[matrix.s3_path_secret] }}
           aws s3 cp build/bin/aws_signing_helper "${S3_DESTINATION}/${S3_PATH}/aws_signing_helper.exe"
+        shell: pwsh
