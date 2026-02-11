@@ -30,12 +30,8 @@ jobs:
         with:
           go-version-file: 'go.mod'
           cache: true
-      
+
       - name: Build Project
-        env:
-          CGO_ENABLED: 1 
-          GOOS: windows
-          GOARCH: ${{ matrix.goarch }}
         run: |
           echo "Building on ${{ matrix.display_name }}"
           $env:CGO_ENABLED = "1"
